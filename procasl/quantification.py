@@ -8,6 +8,8 @@ from nipype.interfaces.base import (
 from nipype.interfaces.base import OutputMultiPath
 from nipype.utils.filemanip import split_filename
 
+from _utils import check_images
+
 
 def compute_perfusion(in_file, ctl_scans=None,
                       tag_scans=None):
@@ -102,7 +104,7 @@ class QuantifyCBF(BaseInterface):
         m0_affine = m0_image.get_affine()
         t1_data = self.inputs.t1_gm  # as recommended in Alsop 2014
 
-        # Check shapes and affines
+        # Check shapes and affines  # TODO: replace with check_images
         if np.any(m0_affine != perfusion_affine):
             print np.max(np.abs(perfusion_affine - m0_affine))
             raise ValueError('affine for {0}: {1}, for {2}:'
@@ -120,7 +122,8 @@ class QuantifyCBF(BaseInterface):
                                                   perfusion_data.shape))
 
         # Compute the CBF
-        m0_data /= 1. - np.exp(- self.inputs.tr / t1_data)
+        m0_data = m0_data.astype(float)
+        m0_data = m0_data / (1. - np.exp(- self.inputs.tr / t1_data))
         non_zero_m0 = np.abs(m0_data) > 1e-4
         brain_blood_coef = 0.9  # brain blood partition coefficient, in mL/g
         unit_scaling = 6000.  # from ml/g/s to ml/100g/min
