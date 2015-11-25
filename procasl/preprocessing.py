@@ -161,7 +161,7 @@ class Rescale(BaseInterface):
     reimplementation of the rescaling method of
     correction_scalefactors_philips_2010.m from the GIN toolbox,
     courtesy of...
-    PASL and PCASL images are acquired in EPI single shot ? with slices from
+    PASL images are acquired in EPI single shot with slices from
     bottom to up of the brain.
     For PASL,
     CBF (ml/100g/min) = deltaM / (2 * M0b * tao * exp(-TI / T1b) * qTI)
@@ -185,6 +185,17 @@ class Rescale(BaseInterface):
     Gunther M. and Zimmer G. Radiology, 2003; 228:523-532.
     Note (Nov 19 2010): T2wm and T2b at 3T were changed to 44.7 and 43.6,
     T2csf if used was set to 74.9 according to Cavusoglu 09 MRI
+
+    Example
+    --------
+    from procasl.preprocessing as asl
+    rescale = asl.Rescale
+    rescale.inputs.in_file = 'raw_asl.nii'
+    rescale.inputs.ss_tr = 35.
+    rescale.inputs.t_i_1 = 800.
+    rescale.inputs.t_i_2 = 1800.
+    out_rescale = rescale.run()
+    print(out_rescale.rescaleed files)
     """
     input_spec = RescaleInputSpec
     output_spec = RescaleOutputSpec
