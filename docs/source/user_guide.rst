@@ -14,5 +14,6 @@ User guide: table of contents
 .. toctree::
    :numbered:
 
-   asl_basic.rst
+   introduction.rst
+   modules/reference.rst
 

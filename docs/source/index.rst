@@ -1,12 +1,9 @@
 =============================================================
-process-asl: Arterial Spin Labeling Data processing in python
+process-asl: Arterial Spin Labeling data processing in python
 =============================================================
 
     process-asl is a Python module for processing Arterial Spin Labeling data.
     Funded by INRIA Parietal, developed in collaboration with Grenoble Institute of Neurosciences.
-
-
-
 
 
 .. toctree::

@@ -20,6 +20,11 @@ import shlex
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('sphinxext'))
+import sphinxgallery
+
+# We also add the directory just above to enable local imports of procasl
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration ------------------------------------------------
 
@@ -29,10 +34,24 @@ import shlex
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = []
+#extensions = []
+#############################
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary',
+              'sphinx.ext.pngmath', 'sphinx.ext.intersphinx',
+              'numpy_ext.numpydoc', 'sphinxgallery.gen_gallery']
+
+autosummary_generate = True
+
+autodoc_default_flags = ['members', 'inherited-members']
+#############################
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+#templates_path = ['_templates']
+##############################
+templates_path = ['templates']
+# generate autosummary even if no references
+autosummary_generate = True
+##############################
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -43,10 +62,17 @@ source_suffix = '.rst'
 #source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+#master_doc = 'index'
+############################
+# Generate the plots for the gallery
+plot_gallery = True
+
+# The master toctree document.
+master_doc = 'user_guide'
+############################
 
 # General information about the project.
-project = u'aslip'
+project = u'procasl'
 copyright = u'2015, the procasl developers'
 author = u'Salma Bougacha'
 
@@ -125,10 +151,10 @@ html_theme_options = {'nosidebar':False}
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = 'Arterial Spin Labeling image processing'
+html_title = 'Arterial Spin Labeling data processing'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-html_short_title = 'ASLip'
+html_short_title = 'procasl'
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
