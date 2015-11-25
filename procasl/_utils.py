@@ -1,5 +1,6 @@
 import os
 import glob
+import warnings
 
 import numpy as np
 import nibabel
@@ -28,6 +29,24 @@ def _list_to_4d(input_files):
     data = np.transpose(data, (1, 2, 3, 0))
 
 
+def check_images(file1, file2):
+    """Check that 2 images have the same affines and data shapes.
+    """
+    img = nibabel.load(file1)
+    shape1 = np.shape(img.get_data())
+    affine1 = img.get_affine()
+    img = nibabel.load(file2)
+    shape2 = np.shape(img.get_data())
+    affine2 = img.get_affine()
+    if shape1 != shape2:
+        raise ValueError('{0} of shape {1}, {2} of shape {3}'.format(
+            file1, shape1, file2, shape2))
+
+    if np.any(affine1 != affine2):
+        raise ValueError('affine for {0}: {1}, for {2}: {3}'
+                         .format(file1, affine1, file2, affine2))
+
+
 def get_vox_dims(in_file):
     if isinstance(in_file, list):
         in_file = in_file[0]
@@ -37,15 +56,19 @@ def get_vox_dims(in_file):
     return [float(voxdims[0]), float(voxdims[1]), float(voxdims[2])]
 
 
-def threshold(in_file, threshold_min, threshold_max):
+def threshold(in_file, threshold_min=-1e7, threshold_max=1e7):
     img = nibabel.load(in_file)
     data = img.get_data()
     data[data > threshold_max] = threshold_max
     data[data < threshold_min] = threshold_min
     img = nibabel.Nifti1Image(data, img.get_affine(), img.get_header())
-    os.remove(in_file)
-    nibabel.save(img, in_file)
-    return in_file
+    out_file, _ = os.path.splitext(in_file)
+    out_file += '_thresholded.nii'
+    if os.path.isfile(out_file):
+        warnings.warn('File {} exits, overwriting.'.format(out_file))
+
+    nibabel.save(img, out_file)
+    return out_file
 
 
 def remove_nan(in_file, fill_value=0.):
@@ -54,6 +77,7 @@ def remove_nan(in_file, fill_value=0.):
     if np.any(np.isnan(data)):
         data[np.isnan(data)] = fill_value
     img = nibabel.Nifti1Image(data, img.get_affine(), img.get_header())
-    os.remove(in_file)
-    nibabel.save(img, in_file)
-    return in_file
+    out_file, _ = os.path.splitext(in_file)
+    out_file += '_no_nan.nii'
+    nibabel.save(img, out_file)
+    return out_file

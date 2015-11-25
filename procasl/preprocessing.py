@@ -11,6 +11,7 @@ from nipype.utils.filemanip import split_filename
 from nipype.interfaces.base import InputMultiPath, OutputMultiPath
 
 from procasl.spm_internals import params_to_affine, spm_affine
+from procasl._utils import check_images
 
 
 def add_prefix(prefix, in_file):
@@ -81,16 +82,13 @@ def compute_mask(in_file, out_file=None):
     return out_file
 
 
-def compute_brain_mask(in_file, out_file=None, frac=0.5, mask=True):
-    if out_file is None:
-        _, base, _ = split_filename(in_file)
-        out_file = os.path.abspath('sc_' + base + '.nii')
-
+def compute_brain_mask(in_file, frac=0.5):
+    """Computes binary brain mask using FSL BET.
+    """
     btr = fsl.BET()
     btr.inputs.in_file = in_file
-    btr.inputs.out_file = out_file
     btr.inputs.frac = frac
-    btr.inputs.mask = mask
+    btr.inputs.mask = True
     res = btr.run()
     return res.outputs.mask_file
 
@@ -102,6 +100,27 @@ def binarize_mask(in_file, threshold=0.5):
     data[data > threshold] = 1
     img = nibabel.Nifti1Image(data, img.get_affine(), img.get_header())
     out_file = nibabel.save(img, add_prefix('bin', in_file))
+    return out_file
+
+
+def apply_mask(in_file, mask_file, mask_value=np.nan):
+    """Masks input with a binary mask_file.
+    """
+    # Load images
+    image = nibabel.load(in_file)
+    data = image.get_data()
+    mask_image = nibabel.load(mask_file)
+    mask_data = mask_image.get_data()
+
+    # Check shapes and affines
+    check_images(in_file, mask_file)
+
+    # Compute the masked image
+    data[mask_data == 0] = mask_value
+    out_image = nibabel.Nifti1Image(data, image.get_affine(),
+                                    image.get_header())
+    out_file = add_prefix('masked_', in_file)
+    nibabel.save(out_image, out_file)
     return out_file
 
 
@@ -139,9 +158,10 @@ class RescaleOutputSpec(TraitedSpec):
 
 class Rescale(BaseInterface):
     """Correct for T1 relaxation between different slices. This is a
-    reimplementation of method from correction_scalefactors_philips_2010.m
-    of GIN toolbox, courtesy of...
-    PASL and PCASL images are acquired in EPI single shot ? with slices from
+    reimplementation of the rescaling method of
+    correction_scalefactors_philips_2010.m from the GIN toolbox,
+    courtesy of...
+    PASL images are acquired in EPI single shot with slices from
     bottom to up of the brain.
     For PASL,
     CBF (ml/100g/min) = deltaM / (2 * M0b * tao * exp(-TI / T1b) * qTI)
@@ -165,6 +185,17 @@ class Rescale(BaseInterface):
     Gunther M. and Zimmer G. Radiology, 2003; 228:523-532.
     Note (Nov 19 2010): T2wm and T2b at 3T were changed to 44.7 and 43.6,
     T2csf if used was set to 74.9 according to Cavusoglu 09 MRI
+
+    Example
+    --------
+    from procasl.preprocessing as asl
+    rescale = asl.Rescale
+    rescale.inputs.in_file = 'raw_asl.nii'
+    rescale.inputs.ss_tr = 35.
+    rescale.inputs.t_i_1 = 800.
+    rescale.inputs.t_i_2 = 1800.
+    out_rescale = rescale.run()
+    print(out_rescale.rescaleed files)
     """
     input_spec = RescaleInputSpec
     output_spec = RescaleOutputSpec
@@ -184,7 +215,7 @@ class Rescale(BaseInterface):
         scaling = scaling[np.newaxis, np.newaxis, :, np.newaxis]
         scaling = np.tile(scaling, (data.shape[0], data.shape[1], 1,
                                     data.shape[-1]))
-        data *= scaling
+        data = data * scaling
         img = nibabel.Nifti1Image(data, img.get_affine(), img.get_header())
         out_file = add_prefix('sc_', self.inputs.in_file)
         nibabel.save(img, out_file)
@@ -216,6 +247,11 @@ class AverageOutputSpec(TraitedSpec):
 class Average(BaseInterface):
     """Compute average functional across time, keeping the affine of
     first scan.
+
+    Note
+    ----
+    This is a reimplementation of the averaging method of
+    average_2010.m from the GIN toolbox.
     """
     input_spec = AverageInputSpec
     output_spec = AverageOutputSpec
@@ -282,9 +318,9 @@ class Realign(BaseInterface):
     pipeline.
 
     Note
-    ----    
-    This is a reimplementation of method from correction_scalefactors_philips_2010.m
-    of GIN toolbox.
+    ----
+    This is a reimplementation of the realignement method from
+    myrealign_pasl_2010.m of GIN toolbox.
 
     Example
     --------
