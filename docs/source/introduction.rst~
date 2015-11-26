@@ -80,7 +80,7 @@ fsl
 
 You should see the FSL GUI with the version number in the header.
 
-**Configuring spm**: Add the following lines specifying the location of the spm folder to your .bashrc file::
+**Configuring SPM**: Add the following lines specifying the location of the spm folder to your .bashrc file::
 
 # SPM8
 export SPM_PATH=/i2bm/local/spm8-standalone/spm8_mcr/spm8
