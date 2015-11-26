@@ -20,19 +20,45 @@ import shlex
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('sphinxext'))
+import sphinx_gallery
+
+# We also add the directory just above to enable local imports of procasl
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration ------------------------------------------------
+#######################
+# Try to override the matplotlib configuration as early as possible
+try:
+    import gen_rst
+except:
+    pass
 
+#######################
 # If your documentation needs a minimal Sphinx version, state it here.
 #needs_sphinx = '1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = []
+#extensions = []
+#############################
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary',
+              'sphinx.ext.pngmath', 'sphinx.ext.intersphinx',
+              'numpy_ext.numpydoc', 'sphinx_gallery.gen_gallery']
+
+autosummary_generate = True
+
+autodoc_default_flags = ['members', 'inherited-members']
+#############################
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+#templates_path = ['_templates']
+##############################
+templates_path = ['templates']
+# generate autosummary even if no references
+autosummary_generate = True
+##############################
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -43,10 +69,17 @@ source_suffix = '.rst'
 #source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+#master_doc = 'index'
+############################
+# Generate the plots for the gallery
+plot_gallery = True
+
+# The master toctree document.
+master_doc = 'user_guide'
+############################
 
 # General information about the project.
-project = u'aslip'
+project = u'procasl'
 copyright = u'2015, the procasl developers'
 author = u'Salma Bougacha'
 
@@ -74,14 +107,18 @@ language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = []
+##############################
+#exclude_patterns = []
+exclude_trees = ['_build', 'templates', 'includes']
+###################################
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
 #default_role = None
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
-#add_function_parentheses = True
+add_function_parentheses = False
+
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
@@ -122,13 +159,14 @@ html_theme_options = {'nosidebar':False}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
+html_theme_path = ['themes']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = 'Arterial Spin Labeling image processing'
+html_title = 'Arterial Spin Labeling data processing'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-html_short_title = 'ASLip'
+html_short_title = 'procasl'
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
@@ -142,7 +180,8 @@ html_short_title = 'ASLip'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+#html_static_path = ['_static']
+html_static_path = ['images', sphinx_gallery.glr_path_static()]
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -168,13 +207,21 @@ html_static_path = ['_static']
 #html_domain_indices = True
 
 # If false, no index is generated.
-html_use_index = True
+#html_use_index = True
+#########################
+# If false, no module index is generated.
+html_use_modindex = False
 
+# If false, no index is generated.
+html_use_index = False
+
+#########################
 # If true, the index is split into individual pages for each letter.
 #html_split_index = False
 
 # If true, links to the reST sources are added to the pages.
 #html_show_sourcelink = True
+html_show_sourcelink = False
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
 html_show_sphinx = False
@@ -205,11 +252,12 @@ html_show_copyright = False
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'procasldoc'
+#htmlhelp_basename = 'procasldoc'
+htmlhelp_basename = 'PythonScientic'
 
 # -- Options for LaTeX output ---------------------------------------------
 
-latex_elements = {
+##latex_elements = {
 # The paper size ('letterpaper' or 'a4paper').
 #'papersize': 'letterpaper',
 
@@ -221,13 +269,12 @@ latex_elements = {
 
 # Latex figure (float) alignment
 #'figure_align': 'htbp',
-}
-
+##}
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'procasl.tex', u'procasl Documentation',
+  (master_doc, 'index', 'procasl.tex', u'procasl Documentation',
    u'Salma Bougacha', 'manual'),
 ]
 
@@ -244,6 +291,38 @@ latex_documents = [
 
 # If true, show URL addresses after external links.
 #latex_show_urls = False
+###################"
+# Additional stuff for the LaTeX preamble.
+latex_preamble = r"""
+\usepackage{amsmath}\usepackage{amsfonts}\usepackage{bm}\usepackage{morefloats}
+\let\oldfootnote\footnote
+\def\footnote#1{\oldfootnote{\small #1}}
+"""
+
+# Documents to append as an appendix to all manuals.
+#latex_appendices = []
+latex_elements = {
+  'classoptions': ',oneside',
+  'babel': '\\usepackage[english]{babel}',
+  # Get completely rid of index
+  'printindex': '',
+}
+
+# If false, no module index is generated.
+latex_use_modindex = False
+latex_domain_indices = False
+
+# Show the page numbers in the references
+latex_show_pagerefs = True
+
+# Show URLs in footnotes
+latex_show_urls = 'footnote'
+
+trim_doctests_flags = True
+
+_python_doc_base = 'http://docs.python.org/2.7'
+
+######################
 
 # Documents to append as an appendix to all manuals.
 #latex_appendices = []
@@ -279,6 +358,7 @@ texinfo_documents = [
 # Documents to append as an appendix to all manuals.
 #texinfo_appendices = []
 
+
 # If false, no module index is generated.
 #texinfo_domain_indices = True
 
@@ -287,3 +367,82 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+
+#######################################
+# Documents to append as an appendix to all manuals.
+#latex_appendices = []
+latex_elements = {
+  'classoptions': ',oneside',
+  'babel': '\\usepackage[english]{babel}',
+  # Get completely rid of index
+  'printindex': '',
+}
+
+# If false, no module index is generated.
+latex_use_modindex = False
+latex_domain_indices = False
+
+# Show the page numbers in the references
+latex_show_pagerefs = True
+
+# Show URLs in footnotes
+latex_show_urls = 'footnote'
+
+trim_doctests_flags = True
+
+_python_doc_base = 'http://docs.python.org/2.7'
+
+# Example configuration for intersphinx: refer to the Python standard library.
+intersphinx_mapping = {
+    _python_doc_base: None,
+    'http://docs.scipy.org/doc/numpy': None,
+    'http://docs.scipy.org/doc/scipy/reference': None,
+    'http://matplotlib.org/': None,
+    'http://scikit-learn.org/stable': None,
+    'http://nipy.org/nibabel': None,
+    #'http://scikit-image.org/docs/0.8.0/': None,
+    #'http://docs.enthought.com/mayavi/mayavi/': None,
+    #'http://statsmodels.sourceforge.net/': None,
+    #'http://pandas.pydata.org': None,
+}
+
+extlinks = {
+    'simple': (_python_doc_base + '/reference/simple_stmts.html#%s', ''),
+    'compound': (_python_doc_base + '/reference/compound_stmts.html#%s', ''),
+}
+
+# TODO: debug this one
+sphinx_gallery_conf = {
+    'examples_dirs'   : ['../procasl/examples'],
+    'gallery_dirs'    : ['auto_examples'],
+    # path to store the module using example template
+    'mod_example_dir'     : 'modules/generated',
+
+    # Your documented modules. In this case sphinx_gallery and numpy
+    # in a tuple of strings.
+    'doc_module'        : 'procasl',
+    'reference_url':  {}
+             # The module you locally document uses a None
+#            'procasl': None,
+
+            # External python modules use their documentation websites
+#            'matplotlib': 'http://matplotlib.org',
+#            'numpy': 'http://docs.scipy.org/doc/numpy-1.9.1',
+#            'nipype': 'http://docs.scipy.org/doc/numpy-1.9.1',
+#            'joblib': 'http://docs.scipy.org/doc/numpy-1.9.1',
+#            'nilearn': 'http://docs.scipy.org/doc/numpy-1.9.1',
+#            'scipy': 'http://docs.scipy.org/doc/scipy-0.11.0/reference',
+#            'nibabel': 'http://nipy.org/nibabel',
+#}
+            }
+
+# Add the 'copybutton' javascript, to hide/show the prompt in code
+# examples
+def setup(app):
+    app.add_javascript('copybutton.js')
+
+
+
+#######################################
+
