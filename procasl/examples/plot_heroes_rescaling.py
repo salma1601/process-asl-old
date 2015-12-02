@@ -15,12 +15,11 @@ out_rescale = rescale(
 # Plot the first volume before and after rescaling
 from nilearn import plotting
 import matplotlib.pylab as plt
-figure, (axes1, axes2) = plt.subplots(2, 1, figsize=(15, 5))
+figure, (axes1, axes2) = plt.subplots(2, 1, figsize=(7, 5))
 for filename, title, axes in zip(
         [raw_asl_file, out_rescale.outputs.rescaled_file],
         ['raw', 'rescaled'], [axes1, axes2]):
     volume_file = preprocessing.save_first_scan(filename)
     plotting.plot_img(volume_file, axes=axes, display_mode='z',
-                      cut_coords=(-20, 45, 55, 65, 75),
-                      title=title, colorbar=True)
+                      cut_coords=(65, 75), title=title, colorbar=True)
 plt.show()
