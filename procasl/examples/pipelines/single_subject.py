@@ -1,7 +1,6 @@
-from nipype.interfaces import fsl
-fsl.FSLCommand.set_default_output_type('NIFTI')
 import nipype.interfaces.spm as spm
-matlab_cmd = '/i2bm/local/spm8-standalone/run_spm8.sh /i2bm/local/spm8-standalone/mcr/v713 script'
+matlab_cmd = '/i2bm/local/spm8-standalone/run_spm8.sh ' +\
+    '/i2bm/local/spm8-standalone/mcr/v713 script'
 spm.SPMCommand.set_mlab_paths(matlab_cmd=matlab_cmd, use_mcr=True)
 from nipype.caching import Memory
 
@@ -13,7 +12,7 @@ mem = Memory('/tmp/no_workflow')
 # Data
 func_file = '/tmp/func.nii'
 anat_file = '/tmp/anat.nii'
-paths = ['/i2bm/local/spm12-standalone-6472/spm12_mcr/spm12/']  # needed ?
+paths = ['/i2bm/local/spm8-standalone/spm8_mcr/spm8/']  # TODO: check needed
 
 # Rescale
 rescale = mem.cache(preprocessing.Rescale)
@@ -48,7 +47,8 @@ out_coregister_anat = coregister_anat(
     apply_to_files=[out_segment.outputs.native_gm_image,
                     out_segment.outputs.native_wm_image],
     write_interp=3,
-    jobtype='estwrite')
+    jobtype='estwrite',
+    paths=paths)
 
 # Get M0
 m0_file = preprocessing.save_first_scan(func_file)
@@ -95,7 +95,6 @@ cbf_map = preprocessing.apply_mask(out_quantify.outputs.cbf_file,
 # Plot CBF map on top of anat
 import matplotlib.pylab as plt
 from nilearn import plotting
-
 plotting.plot_stat_map(
     cbf_map,
     bg_img=out_coregister_anat.outputs.coregistered_source,
