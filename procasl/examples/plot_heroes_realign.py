@@ -26,7 +26,6 @@ for correct_tagging in [True, False]:
         out_realign.outputs.realignment_parameters)[:, 2]
 
 # Plot x-translation parameters with and without tagging correction
-
 import matplotlib.pylab as plt
 figure, (axes1, axes2) = plt.subplots(2, 1, figsize=(10, 5))
 for correct_tagging, label, color in zip([True, False],

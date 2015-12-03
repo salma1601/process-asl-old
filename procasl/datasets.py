@@ -18,8 +18,7 @@ def _single_glob(pattern):
     """
     filenames = glob.glob(pattern)
     if not filenames:
-        print('Warning: non exitant file with pattern {}'.format(pattern))
-        return None
+        raise ValueError('Non exitant file with pattern {}'.format(pattern))
 
     if len(filenames) > 1:
         raise ValueError('Non unique file with pattern {}'.format(pattern))
@@ -27,31 +26,50 @@ def _single_glob(pattern):
     return filenames[0]
 
 
-def load_heroes_dataset(session, n_subjects=None,
-                        data_dir='/volatile/asl_data/heroes/raw'):
-    dataset = {}
-    dataset['subjects'] = [name for name in sorted(os.listdir(data_dir)) if
-                           os.path.isdir(os.path.join(data_dir, name))]
-    dataset['ASL'] = []
-    dataset['anat'] = []
-    dataset['perfW'] = []
-    dataset['CBF'] = []
-    if session == 'basal':
-        session_suffix = '_*.nii'
-        session_prefix = 'basal*'
-    elif session in ['1', '2']:
-        session_suffix = session + '_*.nii'
-        session_prefix = 'vismot*'
-    else:
-        raise ValueError('Unknown session')
+def load_heroes_dataset(
+    n_subjects=None,
+    subjects_parent_directory='/volatile/asl_data/heroes/raw',
+    dataset_pattern={'anat': 't1mri/acquisition1/anat*.nii',
+                     'basal ASL': 'fMRI/acquisition1/basal_rawASL*.nii',
+                     'basal CBF': 'B1map/acquisition1/basal_relCBF*.nii'}
+        ):
+    """Loads the NeuroSpin HEROES dataset.
 
-    for subject_dir in dataset['subjects'][:n_subjects]:
-        subject_dir = os.path.join(data_dir, subject_dir)
-        dataset['anat'].append(
-            _single_glob(os.path.join(subject_dir, 't1mri', 'acquisition1',
-                                      'anat*.nii')))
-        for key in ['ASL', 'perfW', 'CBF']:
-            dataset[key].append(_single_glob(os.path.join(
-                subject_dir, 'fMRI', 'acquisition1',
-                session_prefix + key + session_suffix)))
+    Parameters
+    ----------
+    n_subjects : int or None, optional
+        Number of subjects to load, default to loading all subjects.
+
+    subjects_parent_directory : str, optional
+        Path to the dataset folder containing all subjects folders.
+
+    dataset_pattern : dict, optional
+        Input dictionary. Keys are the names of the images to load, values
+        are strings specifying the unique relative pattern specifying the
+        path to these images within each subject directory.
+
+    Returns
+    -------
+    dataset : dict
+        The absolute paths to the images for all subjects. Keys are the same
+        as the files_patterns keys, values are lists of strings.
+    """
+    # Absolute paths of subjects folders
+    subjects_directories = [os.path.join(subjects_parent_directory, name)
+                            for name in
+                            sorted(os.listdir(subjects_parent_directory))
+                            if os.path.isdir(os.path.join(
+                                subjects_parent_directory, name))]
+    if n_subjects is None:
+        n_subjects = len(subjects_directories)
+
+    subjects_directories = subjects_directories[:n_subjects]
+
+    # Build the path list for each image type
+    dataset = {}
+    for (image_type, file_pattern) in dataset_pattern.iteritems():
+        dataset[image_type] = []
+        for subject_dir in subjects_directories:
+            dataset[image_type].append(
+                _single_glob(os.path.join(subject_dir, file_pattern)))
     return dataset
