@@ -1,7 +1,4 @@
 import nipype.interfaces.spm as spm
-matlab_cmd = '/i2bm/local/spm8-standalone/run_spm8.sh ' +\
-    '/i2bm/local/spm8-standalone/mcr/v713 script'
-spm.SPMCommand.set_mlab_paths(matlab_cmd=matlab_cmd, use_mcr=True)
 from nipype.caching import Memory
 
 from procasl import preprocessing, quantification
@@ -9,14 +6,24 @@ from procasl import preprocessing, quantification
 # Create a memory context
 mem = Memory('/tmp/no_workflow')
 
-# Data
+# Give data location
 func_file = '/tmp/func.nii'
 anat_file = '/tmp/anat.nii'
+
+# Set spm paths
+matlab_cmd = '/i2bm/local/spm8-standalone/run_spm8.sh ' +\
+    '/i2bm/local/spm8-standalone/mcr/v713 script'
+spm.SPMCommand.set_mlab_paths(matlab_cmd=matlab_cmd, use_mcr=True)
 paths = ['/i2bm/local/spm8-standalone/spm8_mcr/spm8/']  # TODO: check needed
+
+# Get Tag/Control sequence
+get_tag_ctl = mem.cache(preprocessing.GetTagControl)
+out_get_tag_ctl = get_tag_ctl(in_file=func_file)
 
 # Rescale
 rescale = mem.cache(preprocessing.Rescale)
-out_rescale = rescale(in_file=func_file, ss_tr=35.4, t_i_1=800., t_i_2=1800.)
+out_rescale = rescale(in_file=out_get_tag_ctl.outputs.tag_ctl_file,
+                      ss_tr=35.4, t_i_1=800., t_i_2=1800.)
 
 # Realign to first scan
 realign = mem.cache(preprocessing.Realign)
