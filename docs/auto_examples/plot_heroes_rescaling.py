@@ -1,4 +1,10 @@
-"""Rescaling step """
+"""
+================
+Rescaling demo
+================
+
+This example compares the images before and after rescaling.
+"""
 # Create a memory context
 from nipype.caching import Memory
 mem = Memory('/tmp/no_workflow')

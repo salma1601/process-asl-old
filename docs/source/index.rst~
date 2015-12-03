@@ -5,6 +5,14 @@ process-asl: Arterial Spin Labeling data processing in python
     process-asl is a Python module for processing Arterial Spin Labeling data.
     Funded by INRIA Parietal, developed in collaboration with Grenoble Institute of Neurosciences.
 
+.. Here we are building the carrousel
+
+.. |preprocessing| image:: auto_examples/images/plot_heroes_rescaling_001.png
+   :target: auto_examples/plot_heroes_rescaling.html
+
+.. |pipelines| image:: auto_examples/pipelines/images/single_subject_001.png
+     :target: auto_examples/pipelines/single_subject.html
+
 
 .. toctree::
    :maxdepth: 2
@@ -27,3 +35,8 @@ process-asl: Arterial Spin Labeling data processing in python
         <h3><a href="user_guide.html"> User Guide</a></h3>
         <p>Browse the full documentation</p>
     </div>
+
+.. include:: modules/generated/procasl.preprocessing.Realign.examples
+.. raw:: html
+
+    <div style='clear:both'></div>

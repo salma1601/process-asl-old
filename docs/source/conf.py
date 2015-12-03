@@ -414,15 +414,15 @@ extlinks = {
 
 # TODO: debug this one
 sphinx_gallery_conf = {
-    'examples_dirs'   : ['../procasl/examples'],
-    'gallery_dirs'    : ['auto_examples'],
+    'examples_dirs'   : ['procasl/examples'],
+    'gallery_dirs'    : ['source/auto_examples'],
     # path to store the module using example template
-    'mod_example_dir'     : 'modules/generated',
+#    'mod_example_dir'     : 'modules/generated',
 
     # Your documented modules. In this case sphinx_gallery and numpy
     # in a tuple of strings.
-    'doc_module'        : 'procasl',
-    'reference_url':  {}
+#    'doc_module'        : 'procasl',
+#    'reference_url':  {}
              # The module you locally document uses a None
 #            'procasl': None,
 

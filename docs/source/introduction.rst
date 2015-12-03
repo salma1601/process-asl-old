@@ -22,6 +22,12 @@ What is procasl: preprocessing and quantification of ASL
 
 Whetting Your Appetite
 ----------------------
+Blood flows from carotid arteries to capilleray bed. The volume of arterial blood (mL) delivered to 100 g of tissue per minute is called the Cerebral Blood Flow (CBF). In human brain, it has a typical value of CBF is 60 mL/100 g-minute. CBF is an important indicator of tissue health [] as well as neuronal activity [].
+
+Prior to ASL, the techniques used for determining cerebral blood flow were rather invasive and involved the 
+of exogenous contrast agents, such as like the 15O H2O radiotracer in Positron Emission Tomography (PET).
+
+
 Ideally, scientists would like to measure neural activity directly. However, as this is nearly impossible under normal circumstances, most researchers have chosen to observe the changes in the metabolic activity that follow mental work using techniques such as BOLD. 
 
 

@@ -65,12 +65,12 @@ uses.
 
    save_first_scan
 
-.. _preprocessing_ref:
+.. _quantification_ref:
 
 :mod:`procasl.quantifying`: CBF Quantification
 ==============================================
 
-.. automodule:: procasl.quantifying
+.. automodule:: procasl.quantification
    :no-members:
    :no-inherited-members:
 
@@ -78,7 +78,7 @@ uses.
 
 **Classes**:
 
-.. currentmodule:: procasl.quantifying
+.. currentmodule:: procasl.quantification
 
 .. autosummary::
    :toctree: generated/
@@ -88,7 +88,7 @@ uses.
 
 **Functions**:
 
-.. currentmodule:: procasl.quantifying
+.. currentmodule:: procasl.quantification
 
 .. autosummary::
    :toctree: generated/

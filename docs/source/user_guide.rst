@@ -12,8 +12,8 @@ User guide: table of contents
 .. include:: tune_toc.rst
 
 .. toctree::
-   :numbered:
 
    introduction.rst
+   pipelines/index.rst
    modules/reference.rst
 
