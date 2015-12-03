@@ -57,7 +57,9 @@ def load_heroes_dataset(
     # Absolute paths of subjects folders
     subjects_directories = [os.path.join(subjects_parent_directory, name)
                             for name in
-                            sorted(os.listdir(subjects_parent_directory))]
+                            sorted(os.listdir(subjects_parent_directory))
+                            if os.path.isdir(os.path.join(
+                                subjects_parent_directory, name))]
     if n_subjects is None:
         n_subjects = len(subjects_directories)
 
