@@ -207,9 +207,6 @@ class Rescale(BaseInterface):
     def _run_interface(self, runtime):
         img = nibabel.load(self.inputs.in_file)
         data = img.get_data()
-
-        # keep only ctl/tag frames  # TODO: this has to be done seperately
-        data = data[..., 1:]
         n_slices = data.shape[2]
         milli_second = 1000.  # 1s in ms
         scaling = np.exp((self.inputs.t_i_2 + self.inputs.ss_tr *
@@ -426,13 +423,13 @@ class GetM0OutputSpec(TraitedSpec):
 
 
 class GetM0(BaseInterface):
-    """Save first scan of a 4D image.
+    """Save the M0 scan from ASL 4D image (first scan).
     """
     input_spec = GetM0InputSpec
     output_spec = GetM0OutputSpec
 
     def _run_interface(self, runtime):
-        # Compute and save the mean
+        # Save first scan
         image = nibabel.load(self.inputs.in_file)
         data = image.get_data()
         data = data[..., 0]
@@ -448,4 +445,44 @@ class GetM0(BaseInterface):
         fname = self.inputs.in_file
         _, base, _ = split_filename(fname)
         outputs["m0_file"] = os.path.abspath('m0_' + base + '.nii')
+        return outputs
+
+
+class GetTagControlInputSpec(BaseInterfaceInputSpec):
+    in_file = File(
+        exists=True,
+        mandatory=True,
+        copyfile=True,
+        desc='The input 4D ASL image filename')
+
+
+class GetTagControlOutputSpec(TraitedSpec):
+    tag_ctl_file = File(
+        exists=True,
+        desc='The tag/control sequence image filename')
+
+
+class GetTagControl(BaseInterface):
+    """Save the tag/control sequence of a 4D ASL image (removes first scan).
+    """
+    input_spec = GetTagControlInputSpec
+    output_spec = GetTagControlOutputSpec
+
+    def _run_interface(self, runtime):
+        # Remove first scan
+        image = nibabel.load(self.inputs.in_file)
+        data = image.get_data()
+        data = data[..., 1:]
+        image = nibabel.Nifti1Image(data, image.get_affine(),
+                                    image.get_header())
+        _, base, _ = split_filename(self.inputs.in_file)
+        out_file = os.path.abspath('tag_ctl_' + base + '.nii')
+        nibabel.save(image, out_file)
+        return runtime
+
+    def _list_outputs(self):
+        outputs = self._outputs().get()
+        fname = self.inputs.in_file
+        _, base, _ = split_filename(fname)
+        outputs["tag_ctl_file"] = os.path.abspath('tag_ctl_' + base + '.nii')
         return outputs
