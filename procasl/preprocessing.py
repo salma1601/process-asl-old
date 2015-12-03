@@ -1,3 +1,4 @@
+# TODO: keep only classes, move functions to _utils, rename to preprocessor
 import os
 
 import numpy as np
@@ -5,6 +6,7 @@ from scipy.io import savemat
 import nibabel
 import nipype.interfaces.spm as spm
 from nipype.interfaces import fsl
+fsl.FSLCommand.set_default_output_type('NIFTI')
 from nipype.interfaces.base import BaseInterface, \
     BaseInterfaceInputSpec, traits, File, TraitedSpec, Directory
 from nipype.utils.filemanip import split_filename
@@ -93,13 +95,15 @@ def compute_brain_mask(in_file, frac=0.5):
     return res.outputs.mask_file
 
 
-def binarize_mask(in_file, threshold=0.5):
+def binarize_mask(in_file, threshold=0.5, out_file=None):
     img = nibabel.load(in_file)
     data = img.get_data()
     data[data <= threshold] = 0
     data[data > threshold] = 1
     img = nibabel.Nifti1Image(data, img.get_affine(), img.get_header())
-    out_file = nibabel.save(img, add_prefix('bin', in_file))
+    if out_file is None:
+        out_file = add_prefix('bin_', in_file)
+    nibabel.save(img, out_file)
     return out_file
 
 
@@ -404,4 +408,44 @@ class Realign(BaseInterface):
             'rp_' + base + '.txt')
         outputs["realigned_files"] = os.path.abspath(
             'r' + base + '.nii')
+        return outputs
+
+
+class GetM0InputSpec(BaseInterfaceInputSpec):
+    in_file = File(
+        exists=True,
+        mandatory=True,
+        copyfile=True,
+        desc='The input 4D ASL image filename')
+
+
+class GetM0OutputSpec(TraitedSpec):
+    m0_file = File(
+        exists=True,
+        desc='The first scan image filename')
+
+
+class GetM0(BaseInterface):
+    """Save first scan of a 4D image.
+    """
+    input_spec = GetM0InputSpec
+    output_spec = GetM0OutputSpec
+
+    def _run_interface(self, runtime):
+        # Compute and save the mean
+        image = nibabel.load(self.inputs.in_file)
+        data = image.get_data()
+        data = data[..., 0]
+        image = nibabel.Nifti1Image(data, image.get_affine(),
+                                    image.get_header())
+        _, base, _ = split_filename(self.inputs.in_file)
+        out_file = os.path.abspath('m0_' + base + '.nii')
+        nibabel.save(image, out_file)
+        return runtime
+
+    def _list_outputs(self):
+        outputs = self._outputs().get()
+        fname = self.inputs.in_file
+        _, base, _ = split_filename(fname)
+        outputs["m0_file"] = os.path.abspath('m0_' + base + '.nii')
         return outputs

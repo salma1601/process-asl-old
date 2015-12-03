@@ -51,13 +51,14 @@ out_coregister_anat = coregister_anat(
     paths=paths)
 
 # Get M0
-m0_file = preprocessing.save_first_scan(func_file)
+get_m0 = mem.cache(preprocessing.GetM0)
+out_get_m0 = get_m0(in_file=func_file)
 
 # Coregister M0 to mean ASL
 coregister_m0 = mem.cache(spm.Coregister)
 out_coregister_m0 = coregister_m0(
     target=out_average.outputs.mean_file,
-    source=m0_file,
+    source=out_get_m0.outputs.m0_file,
     write_interp=3,
     jobtype='estwrite',
     paths=paths)
