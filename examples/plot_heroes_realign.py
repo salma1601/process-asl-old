@@ -10,8 +10,7 @@ correction.
 from nipype.caching import Memory
 mem = Memory('/tmp/no_workflow')
 
-# Give the paths to spm and to the 4D ASL image
-paths = ['/i2bm/local/spm12-standalone-6472/spm12_mcr/spm12/']
+# Give location of the 4D ASL image
 raw_asl_file = '/tmp/func.nii'
 
 # Realign with and without tagging correction
@@ -20,13 +19,12 @@ import numpy as np
 realign = mem.cache(preprocessing.Realign)
 x_translation = {}
 for correct_tagging in [True, False]:
-    out_realign = realign(in_file=raw_asl_file, paths=paths,
+    out_realign = realign(in_file=raw_asl_file,
                           correct_tagging=correct_tagging)
     x_translation[correct_tagging] = np.loadtxt(
         out_realign.outputs.realignment_parameters)[:, 2]
 
 # Plot x-translation parameters with and without tagging correction
-
 import matplotlib.pylab as plt
 figure, (axes1, axes2) = plt.subplots(2, 1, figsize=(10, 5))
 for correct_tagging, label, color in zip([True, False],

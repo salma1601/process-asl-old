@@ -36,7 +36,7 @@ process-asl: Arterial Spin Labeling data processing in python
         <p>Browse the full documentation</p>
     </div>
 
-.. include:: modules/generated/procasl.preprocessing.Rescale.examples
+.. include:: modules/generated/procasl.preprocessing.Rescale
 .. raw:: html
 
     <div style='clear:both'></div>

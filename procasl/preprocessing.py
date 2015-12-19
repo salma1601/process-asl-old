@@ -5,6 +5,10 @@ import numpy as np
 from scipy.io import savemat
 import nibabel
 import nipype.interfaces.spm as spm
+matlab_cmd = '/i2bm/local/spm8-standalone/run_spm8.sh ' +\
+    '/i2bm/local/spm8-standalone/mcr/v713 script'
+spm.SPMCommand.set_mlab_paths(matlab_cmd=matlab_cmd, use_mcr=True)
+
 from nipype.interfaces import fsl
 fsl.FSLCommand.set_default_output_type('NIFTI')
 from nipype.interfaces.base import BaseInterface, \

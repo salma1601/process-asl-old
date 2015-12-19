@@ -109,7 +109,7 @@ language = 'en'
 # directories to ignore when looking for source files.
 ##############################
 #exclude_patterns = []
-exclude_trees = ['_build', 'templates', 'includes']
+exclude_trees = ['build', 'templates', 'includes']
 ###################################
 
 # The reST default role (used for this markup: `text`) to use for all
@@ -414,17 +414,17 @@ extlinks = {
 
 # TODO: debug this one
 sphinx_gallery_conf = {
-    'examples_dirs'   : ['procasl/examples'],
-    'gallery_dirs'    : ['source/auto_examples'],
+    'examples_dirs'   : ['../examples'],
+    'gallery_dirs'    : ['auto_examples'],
     # path to store the module using example template
-#    'mod_example_dir'     : 'modules/generated',
+    'mod_example_dir'     : 'modules/generated',
 
     # Your documented modules. In this case sphinx_gallery and numpy
     # in a tuple of strings.
-#    'doc_module'        : 'procasl',
-#    'reference_url':  {}
+    'doc_module'        : 'procasl',
+#    'reference_url':  {
              # The module you locally document uses a None
-#            'procasl': None,
+#            'process-asl': None,
 
             # External python modules use their documentation websites
 #            'matplotlib': 'http://matplotlib.org',

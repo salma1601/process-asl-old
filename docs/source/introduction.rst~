@@ -7,43 +7,92 @@ Introduction: procasl
     :depth: 1
 
 
-What is procasl: preprocessing and quantification of ASL
-========================================================
+What is procasl: preprocessing and quantification of ASL data
+=============================================================
 
 .. topic:: **Why use procasl?**
 
-    Procasl builds relevant **pipelines** for processing ASL data(
+    Procasl builds relevant **pipelines** for processing arterial speen labeling (ASL) data (
     :ref:`single subject pipeline <single_subject>`,
     :ref:`second level pipeline <second_level>`).
 
-    Procasl can be used on :ref:`pulsed ASL <pulsed_asl_example.py>`,
-    :ref:`pseudo-continuous ASL <pc_asl>`, or 
-    :ref:`continuous ASL <continuous_asl.py>` data.
-
-Whetting Your Appetite
-----------------------
-
-Ideally, scientists would like to measure neural activity directly. However, as this is nearly impossible under normal circumstances, most researchers have chosen to observe the changes in the metabolic activity that follow mental work using techniques such as BOLD. 
+    Procasl can be used on :ref:`pulsed ASL <pulsed_asl_example.py>`
+    and adapted to :ref:`pseudo-continuous ASL <pc_asl>`data.
 
 
-Though measuring changes in blood flow as a consequence of neural activity would be the next most direct approach, this was formerly only obtainable through the use of invasive imaging techniques utilizing exogenous contrast agents. 
+ASL basics
+==========
 
-Thus, most researchers opted to use the BOLD technique, which though dependent on cerebral blood flow (CBF), does not give a direct measure of it. However, due to recent advances in MR imaging, it is now possible to capture CBF measurements entirely non-invasively.
+Weighting the MRI signal by cerebral blood flow
+-----------------------------------------------
+citation
 
-Prior to ASL, the techniques used for determining cerebral blood flow were rather invasive and involved the use of exogenous contrast agents, such as like the 15O H2O radiotracer in Positron Emission Tomography (PET). In this technique, researchers inject a radiotracer (which was essentially radioactively labeled water) into the participant. This radiotracer would then circulate through the body's vascular system, ultimately diffusing freely into brain tissue along with the blood. The radioactive tracer would begin to decay almost immediately, emitting tiny positively charged particles (called positrons) which could then be detected using specialized equipment. As the radiotracer travels with the blood, the amount of radioactvity detected reflects blood flow. That is to say, areas which received a lot of blood should also have received a lot of radioactively labeled water and consequently shown higher levels of radioactive positron emissions. Thus, in for each region of brain tissue, uptake of the radiotracer would be proportional to blood flow.
+Blood flows from carotid arteries to capilleray bed. The volume of arterial blood (mL) delivered to 100 g of tissue per minute is called the Cerebral Blood Flow (CBF). In human brain, it has a typical value of 60 mL/100 g-minute. CBF is a fundamental physiological quantity, closely related to brain function []. It is an important indicator of tissue health [] as well as neuronal activity [].
 
-Similar to PET techniques, ASL utilizes a tracer of sorts. In ASL, arterial blood water is magnetically labeled then imaged. First, arterial blood water is magnetically labeled just below the region (slice) of interest by applying a 180 degree radiofrequency (RF) inversion pulse. The result of this pulse is inversion of the net magnetization of the blood water. In other words, the water molecules within the arterial blood are labeled magnetically. After a period of time (called the transit time), this 'paramagnetic tracer’ flows into slice of interest where it exchanges with tissue water. The inflowing inverted spins within the blood water alter total tissue magnetization, reducing it and, consequently, the MR signal & image intensity. During this time, an image is taken (called the tag image).
+Prior to ASL, the techniques used for determining cerebral blood flow were rather invasive and involved the 
+use of exogenous contrast agents, such as the 15O H2O radiotracer in Positron Emission Tomography (PET) and ... in [nitrous oxide method, perfusion
+CT and DSC-MRI].
 
+
+Imaging principle: Labeling arterial blood water magnetically
+-------------------------------------------------------------
+Similar to these techniques, ASL is based on tracer kinetics but with no contrast agent: blood is used as a tracer by inverting its longitudinal relaxation.
+
+Magnetization is tagged sequentially to capture the flowing of the arterial blood.
+
+First, arterial blood water is magnetically labeled just below the region (slice) of interest by applying a 180 degree radiofrequency (RF) inversion pulse. The result of this pulse is inversion of the net magnetization of the blood water. After a period of time (called the transit time), this 'paramagnetic tracer’ flows into the slice of interest where it exchanges with tissue water. The inflowing inverted spins within the blood water alter total tissue magnetization, reducing it and, consequently, the MR signal & image intensity. During this time, an image is taken (called the tag image). 
 The experiment is then repeated without labeling the arterial blood to create another image (called the control image). The control image and the tag image are subtracted to produce a perfusion image. This image will reflect the amount of arterial blood delivered to each voxel within the slice within the transit time.
 
-ASL: labeling arterial blood water magnetically before imaging
---------------------------------------------------------------
-Magnetization is tagged sequentially to capture the flowing of the arterial blood.
 Many modalities and many sequences exist, and ASL techniques is an active research field.
 More on http://fmri.research.umich.edu/research/main_topics/asl.php
 
-ASL allows weighting of the MRI signal by cerebral blood flow
--------------------------------------------------------------
+
+From ASL images to CBF: Quantification how tos
+----------------------------------------------
+CBF ~ M_ctl - M_tag
+To obtain absolute perfusion (CBF) in ml/100ml/min,
+the mean difference image is multiplied by constant factors.
+This scaling is essential for “whole brain” diseases,
+like large vessel occlusive disease, neurodegenerative
+disease, sickle cell disease, etc . It plays an important role when
+comparing patients to controls, to avoid misinterpreting a difference in
+these factors (T1, labeling efficiency) as a difference in brain perfusion.
+
+Some factors, such as transit time or labeling efficiency for
+different arteries, vary within the ASL-image and therefore will
+change relative perfusion. 
+
+- How does disease affect blood flow distribution
+
+- Relative perfusion of tumor compared to normal appearing
+GM/WM
+
+- Comparison with contralateral hemisphere
+
+Correction for regional differences is thus important and can be done through
+more elaborate methods and additionnal acquisitions.
+This model is simplified, but is recommended for its
+robustness and simplicity, and because more complete
+models require additional information that involves
+more scan time, and often only reduces systematic errors
+at the cost of SNR. Types of additional information
+include ATT, water exchange rates and times between
+blood and tissue, tissue T 1 values, and tissue segmenta-
+tion. Ongoing active research aims to more fully under-
+stand the range and effects of these parameters, but the
+complexity, uncertainty, and additional noise associated
+with correcting for these factors was deemed to be coun-
+terproductive as a default protocol at this stage of adop-
+tion of clinical ASL.
+
+
+:General kinetic model:
+
+:The parameters:
+
+
+Applications
+------------
 The cerebral blood flow (CBF) is a fundamental physiological quantity, closely related to brain function.
 
 :Diagnosis:
@@ -53,12 +102,8 @@ The cerebral blood flow (CBF) is a fundamental physiological quantity, closely r
 :Assessing the neural contribution in activation BOLD signal:
 
 
-Quantification: from ASL images to CBF
---------------------------------------
-
-:General kinetic model:
-
-:The parameters:
+Whetting Your Appetite
+----------------------
 
 
 Installation

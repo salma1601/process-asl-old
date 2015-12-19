@@ -1,4 +1,9 @@
-"""A basic multiple subjects pipeline. CBF maps are normalized to
+"""
+===============================
+Multiple subjects pipeline demo
+===============================
+
+A basic multiple subjects pipeline. CBF maps are normalized to
 the reference MNI template.
 """
 import matplotlib.pylab as plt
@@ -16,13 +21,12 @@ heroes = datasets.load_heroes_dataset(
                      'basal ASL': 'fMRI/acquisition1/basal_rawASL*.nii'})
 
 # Create a memory context
-mem = Memory('/tmp/no_workflow')
+mem = Memory('/tmp')
 
 # Set spm paths
-matlab_cmd = '/i2bm/local/spm8-standalone/run_spm8.sh ' +\
-    '/i2bm/local/spm8-standalone/mcr/v713 script'
-spm.SPMCommand.set_mlab_paths(matlab_cmd=matlab_cmd, use_mcr=True)
-paths = ['/i2bm/local/spm8-standalone/spm8_mcr/spm8/']
+#matlab_cmd = '/i2bm/local/spm8-standalone/run_spm8.sh ' +\
+#    '/i2bm/local/spm8-standalone/mcr/v713 script'
+#spm.SPMCommand.set_mlab_paths(matlab_cmd=matlab_cmd, use_mcr=True)
 
 # Loop over subjects
 for (func_file, anat_file) in zip(
@@ -41,8 +45,7 @@ for (func_file, anat_file) in zip(
     out_realign = realign(
         in_file=out_rescale.outputs.rescaled_file,
         register_to_mean=False,
-        correct_tagging=True,
-        paths=paths)
+        correct_tagging=True)
 
     # Compute mean ASL
     average = mem.cache(preprocessing.Average)
@@ -55,8 +58,7 @@ for (func_file, anat_file) in zip(
         gm_output_type=[True, False, True],
         wm_output_type=[True, False, True],
         csf_output_type=[True, False, True],
-        save_bias_corrected=True,
-        paths=paths)
+        save_bias_corrected=True)
 
     # Coregister anat to mean ASL
     coregister_anat = mem.cache(spm.Coregister)
@@ -66,8 +68,7 @@ for (func_file, anat_file) in zip(
         apply_to_files=[out_segment.outputs.native_gm_image,
                         out_segment.outputs.native_wm_image],
         write_interp=3,
-        jobtype='estwrite',
-        paths=paths)
+        jobtype='estwrite')
 
     # Get M0
     get_m0 = mem.cache(preprocessing.GetM0)
@@ -79,15 +80,13 @@ for (func_file, anat_file) in zip(
         target=out_average.outputs.mean_file,
         source=out_get_m0.outputs.m0_file,
         write_interp=3,
-        jobtype='estwrite',
-        paths=paths)
+        jobtype='estwrite')
 
     # Smooth M0
     smooth_m0 = mem.cache(spm.Smooth)
     out_smooth_m0 = smooth_m0(
         in_files=out_coregister_m0.outputs.coregistered_source,
-        fwhm=[5., 5., 5.],
-        paths=paths)
+        fwhm=[5., 5., 5.])
 
     # Compute perfusion
     n_scans = preprocessing.get_scans_number(
@@ -119,8 +118,7 @@ for (func_file, anat_file) in zip(
                         brain_mask_file],
         write_voxel_sizes=_utils.get_vox_dims(func_file),
         write_interp=2,
-        jobtype='write',
-        paths=paths)
+        jobtype='write')
 
     # Mask CBF map with brain mask
     cbf_map = preprocessing.apply_mask(

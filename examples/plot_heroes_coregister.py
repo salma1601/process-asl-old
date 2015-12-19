@@ -1,4 +1,9 @@
-"""This example shows a basic coregistration step from anatomical to mean
+"""
+===================
+Coregistration demo
+===================
+
+This example shows a basic coregistration step from anatomical to mean
 functional.
 """
 # Create a memory context
@@ -6,7 +11,7 @@ from nipype.caching import Memory
 mem = Memory('/tmp/no_workflow')
 
 # Give the paths to spm
-paths = ['/i2bm/local/spm12-standalone-6472/spm12_mcr/spm12/']
+#paths = ['/i2bm/local/spm12-standalone-6472/spm12_mcr/spm12/']
 
 # Compute mean functional
 from procasl import preprocessing

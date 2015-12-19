@@ -27,8 +27,8 @@ def _single_glob(pattern):
 
 
 def load_heroes_dataset(
-    n_subjects=None,
     subjects_parent_directory='/volatile/asl_data/heroes/raw',
+    subjects_basenames=None,
     dataset_pattern={'anat': 't1mri/acquisition1/anat*.nii',
                      'basal ASL': 'fMRI/acquisition1/basal_rawASL*.nii',
                      'basal CBF': 'B1map/acquisition1/basal_relCBF*.nii'}
@@ -37,11 +37,11 @@ def load_heroes_dataset(
 
     Parameters
     ----------
-    n_subjects : int or None, optional
-        Number of subjects to load, default to loading all subjects.
-
     subjects_parent_directory : str, optional
         Path to the dataset folder containing all subjects folders.
+
+    subjects_basenames : lit of str or None, optional
+        Subjects base directories to load, default to loading all subjects.
 
     dataset_pattern : dict, optional
         Input dictionary. Keys are the names of the images to load, values
@@ -54,16 +54,13 @@ def load_heroes_dataset(
         The absolute paths to the images for all subjects. Keys are the same
         as the files_patterns keys, values are lists of strings.
     """
-    # Absolute paths of subjects folders
+    # Form absolute paths of subjects folders
+    if subjects_basenames is None:
+        subjects_basenames = [name for name in sorted(os.listdir(
+            subjects_parent_directory)) if
+            os.path.isdir(os.path.join(subjects_parent_directory, name))]
     subjects_directories = [os.path.join(subjects_parent_directory, name)
-                            for name in
-                            sorted(os.listdir(subjects_parent_directory))
-                            if os.path.isdir(os.path.join(
-                                subjects_parent_directory, name))]
-    if n_subjects is None:
-        n_subjects = len(subjects_directories)
-
-    subjects_directories = subjects_directories[:n_subjects]
+                            for name in subjects_basenames]
 
     # Build the path list for each image type
     dataset = {}
