@@ -1,2 +1,2 @@
-# test-repo
-a repo for testing behaviors of github, sphinx, etc
+# process-asl
+Arterial Spin Labeling Data Processing in Python
