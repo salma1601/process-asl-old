@@ -19,14 +19,14 @@ def params_to_affine(params):
     Mimics the spm function spm_matrix.
 
     Parameters
-    ==========
+    ----------
     params : 1D numpy.ndarray of size 6 or 12
         Parameters of the transform, in the following order:
         Tx, Ty, Tz, pitch, roll, yaw
         and possibly 3 zooms and 3 shears
 
     Returns
-    =======
+    -------
     affine : numpy.ndarray of shape (4, 4)
         The affine transformation matrix.
     """
@@ -66,12 +66,12 @@ def affine_to_params(affine):
     parameters. Mimics the spm function spm_imatrix.
 
     Parameters
-    ==========
+    ----------
     affine : numpy.ndarray of shape (4, 4)
         The affine transformation matrix.
 
     Returns
-    =======
+    -------
     params : numpy.ndarray of shape (12, )
         Parameters of the transform, in the following order:
         Tx, Ty, Tz, pitch, roll, yaw
@@ -120,17 +120,17 @@ def spm_affine(in_file):
     Mimics the spm function spm_get_space.
 
     Parameters
-    ==========
+    ----------
     in_file : str
         Path to an existant nifti image.
 
     Returns
-    =======
+    -------
     affine : numpy.ndarray of shape (4, 4)
         The affine transformation matrix.
 
-    Note
-    ====
+    Notes
+    -----
     This function uses nibabel to read the affine transform and corrects the
     translation part to match the affine output of spm.
     """

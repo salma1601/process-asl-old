@@ -190,7 +190,7 @@ class Rescale(BaseInterface):
     Note (Nov 19 2010): T2wm and T2b at 3T were changed to 44.7 and 43.6,
     T2csf if used was set to 74.9 according to Cavusoglu 09 MRI
 
-    Example
+    Examples
     --------
     from procasl.preprocessing as asl
     rescale = asl.Rescale
@@ -240,7 +240,7 @@ class AverageInputSpec(BaseInterfaceInputSpec):
 
 
 class AverageOutputSpec(TraitedSpec):
-    mean_file = OutputMultiPath(
+    mean_image = OutputMultiPath(
         traits.Either(traits.List(File(exists=True)), File(exists=True)),
         desc='The average image file')
 
@@ -249,8 +249,8 @@ class Average(BaseInterface):
     """Compute average functional across time, keeping the affine of
     first scan.
 
-    Note
-    ----
+    Notes
+    -----
     This is a reimplementation of the averaging method of
     average_2010.m from the GIN toolbox.
     """
@@ -272,7 +272,7 @@ class Average(BaseInterface):
         outputs = self._outputs().get()
         fname = self.inputs.in_file
         _, base, _ = split_filename(fname)
-        outputs["mean_file"] = os.path.abspath(
+        outputs["mean_image"] = os.path.abspath(
             'mean_' + base + '.nii')
         return outputs
 
@@ -318,12 +318,12 @@ class Realign(BaseInterface):
     """Realign functional scans. Default parameters are those of the GIN
     pipeline.
 
-    Note
-    ----
+    Notes
+    -----
     This is a reimplementation of the realignement method from
     myrealign_pasl_2010.m of GIN toolbox.
 
-    Example
+    Examples
     --------
     import procasl.preprocessing as asl
     realign = asl.Realign

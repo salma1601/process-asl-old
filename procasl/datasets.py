@@ -4,7 +4,7 @@ import glob
 
 def _single_glob(pattern):
     """Returns the file matching a given pattern. An error is raised if
-    multiple files match the pattern.
+    no file/multiple files match the pattern
 
     Parameters
     ----------
@@ -27,7 +27,7 @@ def _single_glob(pattern):
 
 
 def load_heroes_dataset(
-    n_subjects=None,
+    subjects=None,
     subjects_parent_directory='/volatile/asl_data/heroes/raw',
     dataset_pattern={'anat': 't1mri/acquisition1/anat*.nii',
                      'basal ASL': 'fMRI/acquisition1/basal_rawASL*.nii',
@@ -37,8 +37,8 @@ def load_heroes_dataset(
 
     Parameters
     ----------
-    n_subjects : int or None, optional
-        Number of subjects to load, default to loading all subjects.
+    subjects : sequence of int or None, optional
+        ids of subjects to load, default to loading all subjects.
 
     subjects_parent_directory : str, optional
         Path to the dataset folder containing all subjects folders.
@@ -60,10 +60,16 @@ def load_heroes_dataset(
                             sorted(os.listdir(subjects_parent_directory))
                             if os.path.isdir(os.path.join(
                                 subjects_parent_directory, name))]
-    if n_subjects is None:
-        n_subjects = len(subjects_directories)
+    max_subjects = len(subjects_directories)
+    if subjects is None:
+        subjects = range(max_subjects)
+    else:
+        if max(subjects) > max_subjects:
+            raise ValueError('Got {0} subjects, you provided ids {1}'
+                             ''.format(max_subjects, str(subjects)))
 
-    subjects_directories = subjects_directories[:n_subjects]
+    subjects_directories = [subjects_directories[subject_id] for subject_id in
+                            subjects]
 
     # Build the path list for each image type
     dataset = {}

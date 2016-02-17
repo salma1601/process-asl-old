@@ -1,3 +1,5 @@
+*~
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -51,7 +53,17 @@ coverage.xml
 *.log
 
 # Sphinx documentation
-docs/build/
+doc/_build/
+doc/modules/generated
+doc/interfaces/generated
+doc/auto_examples/
+doc/tutorials/
 
 # PyBuilder
 target/
+
+# Nifti images
+*.nii
+
+# Matlab files
+*.m
